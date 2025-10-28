@@ -1,14 +1,13 @@
 def ask_llm(prompt: str) -> str:
     """
     placeholder brain.
-    later:
-    - send `prompt` to a local model or api
-    - get actual response
+    later this will call the real model.
+    for now it's not.
     """
-    # dumb example logic just so it feels alive
-    if "cpu" in prompt.lower():
-        return "i can't read system stats yet, but that'll be part of system status in v1."
-    if "who are you" in prompt.lower():
-        return "i'm cosync. i'm running locally and i'm here to make your life easier."
 
-    return f"i heard you say: '{prompt}'. i'll get smarter once you hook up the real model."
+    # tune this voice however later
+    return (
+        "you said: '"
+        + prompt
+        + "'. i'm answering with the placeholder model right now. i'll get upgraded soon."
+    )
