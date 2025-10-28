@@ -1,11 +1,12 @@
 import platform
-import psutil  # you'll need to install this one
+import psutil
+import re
+
+# import spotify helpers
+import spotify_control
+
 
 def get_system_status():
-    """
-    returns a summary of basic system info.
-    later you can make this way deeper (gpu temp, ram %, etc.)
-    """
     try:
         cpu_percent = psutil.cpu_percent(interval=0.5)
         ram = psutil.virtual_memory()
@@ -27,26 +28,45 @@ def get_system_status():
         return f"couldn't read system status yet ({e})"
 
 
-def handle_command(user_text: str):
-    """
-    checks if the user_text is a known local command.
-    if yes -> run it here and return a response string.
-    if no  -> return None so main code knows to call the llm instead.
-    """
+def handle_spotify_command(text: str):
+    # pause / resume
+    if "pause" in text and "spotify" in text or "pause the music" in text:
+        return spotify_control.spotify_pause()
 
+    if ("resume" in text or "play again" in text or "continue" in text) and (
+        "spotify" in text or "music" in text
+    ):
+        return spotify_control.spotify_resume()
+
+    # next song
+    if "next song" in text or "skip" in text:
+        return spotify_control.spotify_next()
+
+    # what's playing
+    if "what's playing" in text or "what song is this" in text or "current track" in text:
+        return spotify_control.spotify_current_track()
+
+    # play something specific
+    # ex: "play travis scott", "play drake", "play my chill playlist"
+    m = re.match(r"play (.+)", text)
+    if m:
+        query = m.group(1)
+        return spotify_control.spotify_play_search(query)
+
+    return None
+
+
+def handle_command(user_text: str):
     text = user_text.lower().strip()
 
-    # system status command
+    # system level stuff
     if "system status" in text or "cpu temp" in text or "how's my pc" in text:
         return get_system_status()
 
-    # sleep / shutdown / etc could go here later
-    # if "sleep mode" in text:
-    #     return run_sleep_mode_scene()
+    # spotify
+    spotify_result = handle_spotify_command(text)
+    if spotify_result is not None:
+        return spotify_result
 
-    # smart home stuff will live here too later:
-    # if "focus mode" in text or "focus scene" in text:
-    #     return set_scene("focus")
-
-    # not a command we handle locally
+    # not a known direct command
     return None
