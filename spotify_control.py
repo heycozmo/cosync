@@ -1,10 +1,14 @@
+import os
+from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
-# you'll fill these in with your real values once you make the spotify app
-CLIENT_ID = "YOUR_CLIENT_ID_HERE"
-CLIENT_SECRET = "YOUR_CLIENT_SECRET_HERE"
-REDIRECT_URI = "http://localhost:8888/callback"
+# load secrets from .env
+load_dotenv()
+
+CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
+CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
+REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI")
 
 SCOPE = (
     "user-read-playback-state "
@@ -54,36 +58,33 @@ def spotify_current_track():
     artist_str = ", ".join(artist_names)
 
     is_paused = not data["is_playing"]
-
     status = "paused" if is_paused else "playing"
+
     return f"current track: {track} by {artist_str} ({status})."
 
 
 def spotify_play_search(query: str):
     """
-    try to play a track/artist/playlist just by text.
-    ex: 'play travis scott' or 'play my chill playlist'
+    'play travis scott'
+    'play my chill playlist'
+    'play after hours'
     """
     sp = get_spotify_client()
 
-    # search for the query
     results = sp.search(q=query, type="track,playlist,artist", limit=1)
 
-    # try track first
     tracks = results.get("tracks", {}).get("items", [])
     if tracks:
         uri = tracks[0]["uri"]
         sp.start_playback(uris=[uri])
         return f"playing {tracks[0]['name']} by {tracks[0]['artists'][0]['name']}."
 
-    # then playlist
     playlists = results.get("playlists", {}).get("items", [])
     if playlists:
         uri = playlists[0]["uri"]
         sp.start_playback(context_uri=uri)
         return f"playing playlist {playlists[0]['name']}."
 
-    # then artist (will start artist radio)
     artists = results.get("artists", {}).get("items", [])
     if artists:
         uri = artists[0]["uri"]
