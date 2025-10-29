@@ -1,5 +1,5 @@
 import platform
-import psutil
+import psutil # type: ignore
 import re
 
 # import spotify helpers
@@ -30,30 +30,29 @@ def get_system_status():
 
 def handle_spotify_command(text: str):
     # pause / resume
-    if "pause" in text and "spotify" in text or "pause the music" in text:
-        return spotify_control.spotify_pause()
+    if ("pause" in text and "spotify" in text) or ("pause the music" in text):
+        return spotify_control.spotify_pause(), "spotify_pause"
 
-    if ("resume" in text or "play again" in text or "continue" in text) and (
-        "spotify" in text or "music" in text
-    ):
-        return spotify_control.spotify_resume()
+    if (("resume" in text or "play again" in text or "continue" in text) and
+        ("spotify" in text or "music" in text)):
+        return spotify_control.spotify_resume(), "spotify_resume"
 
     # next song
     if "next song" in text or "skip" in text:
-        return spotify_control.spotify_next()
+        return spotify_control.spotify_next(), "spotify_next"
 
     # what's playing
     if "what's playing" in text or "what song is this" in text or "current track" in text:
-        return spotify_control.spotify_current_track()
+        return spotify_control.spotify_current_track(), "spotify_current_track"
 
     # play something specific
     # ex: "play travis scott", "play drake", "play my chill playlist"
     m = re.match(r"play (.+)", text)
     if m:
         query = m.group(1)
-        return spotify_control.spotify_play_search(query)
+        return spotify_control.spotify_play_search(query), "spotify_play_search"
 
-    return None
+    return None, None
 
 
 def handle_command(user_text: str):
@@ -61,12 +60,12 @@ def handle_command(user_text: str):
 
     # system level stuff
     if "system status" in text or "cpu temp" in text or "how's my pc" in text:
-        return get_system_status()
+        return get_system_status(), "system_status"
 
     # spotify
-    spotify_result = handle_spotify_command(text)
+    spotify_result, handler_name = handle_spotify_command(text)
     if spotify_result is not None:
-        return spotify_result
+        return spotify_result, handler_name
 
     # not a known direct command
-    return None
+    return None, None
