@@ -28,6 +28,7 @@ its goal: to feel *alive* on your system — capable of reacting, remembering, a
 - ⚙️ modular design — extendable for future systems (pulse, memory, dashboard, etc.)
 
 ### 🗂 folder structure
+```
 cosync/
 │
 ├── main.py               # core loop (routing + input/output)
@@ -38,7 +39,7 @@ cosync/
 ├── speech_to_text.py     # placeholder for future mic input
 ├── logger.py             # jsonl logging system
 └── README.md
-
+```
 ---
 
 ## 🧭 roadmap
