@@ -109,8 +109,11 @@ def ask_llm(
                 continue
             data = json.loads(line)
             if "response" in data:
-                response_text += data["response"]
+                chunk = data["response"]
+                response_text += chunk
+                print(chunk, end="", flush=True)  # <-- stream output to terminal in real-time
             if data.get("done"):
+                print()  # newline at the end of generation
                 break
 
         return response_text.strip() if response_text else "[no response]"
