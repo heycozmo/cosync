@@ -69,34 +69,24 @@ user: {user_input}
         raise e  # let frontend catch it
     
 def stream_llm(user_input: str):
-    prompt = f"""
-you are cosync, a fast and minimal AI assistant.
-respond clearly and concisely.
+    response = requests.post(
+        "http://localhost:11434/api/chat",
+        json={
+            "model": "mistral:latest",
+            "messages": [
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_input}
+            ],
+            "stream": True
+        },
+        stream=True
+    )
 
-user: {user_input}
-"""
-
-    try:
-        with requests.post(
-            "http://localhost:11434/api/generate",
-            json={
-                "model": "mistral:latest",
-                "prompt": prompt,
-                "stream": True,
-                "options": {
-                    "temperature": 0.6
-                }
-            },
-            stream=True,
-            timeout=30
-        ) as response:
-
-            for line in response.iter_lines():
-                if line:
-                    data = json.loads(line)
-                    chunk = data.get("response", "")
-                    yield chunk
-
-    except Exception as e:
-        print("STREAM ERROR:", e)
-        raise e
+    for line in response.iter_lines():
+        if line:
+            try:
+                data = json.loads(line.decode("utf-8"))
+                if "message" in data and "content" in data["message"]:
+                    yield data["message"]["content"]
+            except:
+                continue
