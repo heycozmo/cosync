@@ -7,6 +7,7 @@
         font-family: Arial, sans-serif;
         background-color: #0f0f0f;
         color: white;
+        line-height: 1.4;
     }
 
     #app {
@@ -18,9 +19,11 @@
     #topbar {
         display: flex;
         justify-content: space-between;
-        padding: 10px 20px;
+        align-items: center;
+        padding: 14px 22px;
         font-size: 14px;
         border-bottom: 1px solid #222;
+        letter-spacing: 0.2px;
     }
 
     #main {
@@ -32,13 +35,14 @@
 
     #chat {
         width: 100%;
-        max-width: 600px;
-        padding: 20px;
+        max-width: 640px;
+        padding: 24px 20px 28px;
         overflow-y: auto;
+        box-sizing: border-box;
     }
 
     #input-area {
-        padding: 15px;
+        padding: 14px 16px 18px;
         border-top: 1px solid #222;
         display: flex;
         justify-content: center;
@@ -46,11 +50,14 @@
 
     #input-area-inner {
         display: flex;
+        align-items: flex-end;
+        gap: 8px;
         width: 100%;
-        max-width: 600px;
+        max-width: 640px;
         background: #1a1a1a;
-        border-radius: 10px;
-        padding: 5px;
+        border: 1px solid #2a2a2a;
+        border-radius: 12px;
+        padding: 6px;
     }
 
     #inputBox {
@@ -58,12 +65,14 @@
         background: transparent;
         border: none;
         color: white;
-        padding: 10px;
+        padding: 10px 12px;
         outline: none;
         resize: none;
         min-height: 40px;
         max-height: 120px;
         overflow-y: auto;
+        font-size: 14px;
+        line-height: 1.45;
     }
 
     button {
@@ -75,6 +84,11 @@
         border-radius: 8px;
         cursor: pointer;
         font-size: 16px;
+        transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+        background: #343434;
     }
 
     #status-container {
@@ -102,6 +116,37 @@
     @keyframes spin {
         from { transform: rotate(0deg); }
         to { transform: rotate(360deg); }
+    }
+
+    .chat-message {
+        margin-bottom: 12px;
+        max-width: 72%;
+        padding: 10px 14px;
+        border-radius: 14px;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: 14px;
+    }
+
+    .chat-message-user {
+        background: #2a2a2a;
+        margin-left: auto;
+        border: 1px solid #373737;
+    }
+
+    .chat-message-assistant {
+        background: #171717;
+        margin-right: auto;
+        border: 1px solid #2a2a2a;
+    }
+
+    .chat-message-thinking {
+        margin-bottom: 12px;
+        max-width: 72%;
+        margin-right: auto;
+        opacity: 0.6;
+        font-style: italic;
+        font-size: 14px;
     }
 </style>
 <title>Cosync</title>
@@ -247,23 +292,16 @@
             messages.forEach(msg => {
                 const div = document.createElement("div");
                 div.innerText = msg.text;
-                div.style.marginBottom = "10px";
-                div.style.maxWidth = "70%";
 
                 if (msg.text === "thinking...") {
-                    div.style.opacity = "0.6";
-                    div.style.fontStyle = "italic";
-                    div.style.marginRight = "auto";
+                    div.className = "chat-message-thinking";
                 } else {
-                    div.style.padding = "10px 14px";
-                    div.style.borderRadius = "12px";
+                    div.className = "chat-message";
 
                     if (msg.type === "user") {
-                        div.style.background = "#2a2a2a";
-                        div.style.marginLeft = "auto";
+                        div.classList.add("chat-message-user");
                     } else {
-                        div.style.background = "#1a1a1a";
-                        div.style.marginRight = "auto";
+                        div.classList.add("chat-message-assistant");
                     }
                 }
 

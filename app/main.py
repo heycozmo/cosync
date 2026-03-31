@@ -26,14 +26,13 @@ def command(data: dict):
     
     result = route_command(user_input)
 
-    if result["type"] == "text":
-        return result
-
-    elif result["type"] == "llm":
+    if result["type"] == "llm":
         return StreamingResponse(
-            stream_llm(result["content"]),
+            stream_llm(result["input"]),
             media_type="text/plain"
         )
+
+    return result
 
 
 @app.get("/ui", response_class=HTMLResponse)

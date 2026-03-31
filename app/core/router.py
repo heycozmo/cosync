@@ -10,13 +10,19 @@ def route_command(user_input: str):
         return {"type": "text", "content": "lighting command detected"}
     
     elif "weather" in user_input:
-        return {"type": "text", "content": get_weather()}
-    
+        return {
+            "type": "text",
+            "response": get_weather()
+        }
+
     elif "time" in user_input:
-        return {"type": "text", "content": get_time()}
+        return {
+            "type": "text",
+            "response": get_time()
+        }
     
     else:
         return {
-            "type": "text",
-            "response": chat_fallback(user_input)
+            "type": "llm",
+            "input": user_input
         }
