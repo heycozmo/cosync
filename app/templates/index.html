@@ -130,6 +130,24 @@
     </div>
 
     <script>
+        function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        window.onload = async () => {
+                updateStatus("booting");
+
+                try {
+                    await sleep(500); // visual delay
+
+                    const res = await fetch("/startup");
+                    await res.json();
+
+                    updateStatus("idle");
+                } catch {
+                    updateStatus("error");
+                }
+            };
+
         let messages = [];
 
         async function sendCommand() {
@@ -160,9 +178,23 @@
                 // let "thinking..." exist briefly
                 await new Promise(r => setTimeout(r, 150));
 
-                // reuse the thinking message
                 let currentMessage = messages[messages.length - 1];
 
+                const contentType = res.headers.get("content-type");
+
+                // case 1 - JSON response (time, weather, etc.)
+                if (contentType && contentType.includes("application/json")) {
+                    const data = await res.json();
+
+                    currentMessage.text = data.response;
+                    currentMessage.type = "assistant";
+
+                    renderMessages();
+                    updateStatus("idle");
+                    return;
+                }
+
+                // case 2 - streaming response (LLM)
                 const reader = res.body.getReader();
                 const decoder = new TextDecoder();
 
@@ -174,7 +206,6 @@
 
                     const chunk = decoder.decode(value);
 
-                    // only clear "thinking..." when first chunk arrives
                     if (!started) {
                         currentMessage.text = "";
                         currentMessage.type = "assistant";
@@ -262,6 +293,9 @@
                 color = "#4caf50";
                 ring.style.borderWidth = "2px";
                 ring.style.opacity = "1";
+            } else if (status === "booting") {
+                color = "#2196f3";
+                ring.style.opacity = "0.8";
             } else if (status === "thinking") {
                 color = "#ff9800";
                 ring.style.borderWidth = "2px";

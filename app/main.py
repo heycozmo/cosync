@@ -9,6 +9,12 @@ load_dotenv()
 
 app = FastAPI()
 
+@app.get("/startup")
+def startup():
+    # check ollama
+    # check anything else later
+    return {"status": "ready"}
+
 @app.get("/")
 def root():
     return {"message": "cosync is running"}
@@ -21,7 +27,7 @@ def command(data: dict):
     result = route_command(user_input)
 
     if result["type"] == "text":
-        return {"response": result["content"]}
+        return result
 
     elif result["type"] == "llm":
         return StreamingResponse(

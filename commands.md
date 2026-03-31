@@ -1,3 +1,5 @@
+open a terminal
+run: ollama pull mistral
 run discord_bot.py
 then:
 python -m uvicorn app.main:app --reload

@@ -16,4 +16,7 @@ def route_command(user_input: str):
         return {"type": "text", "content": get_time()}
     
     else:
-        return {"type": "llm", "content": original_input}
+        return {
+            "type": "text",
+            "response": chat_fallback(user_input)
+        }
